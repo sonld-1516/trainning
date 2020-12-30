@@ -28,6 +28,21 @@ set :puma_init_active_record, true
 set :puma_preload_app, false
 set :rbenv_map_bins, %w(rake gem bundle ruby rails puma pumactl)
 
+namespace :rails do
+  desc 'Open a rails console `cap [staging] rails:console [server_index default: 0]`'
+  task :console do
+    server = roles(:app)[ARGV[2].to_i]
+
+    puts "Opening a console on: #{server.hostname}...."
+
+    cmd = "ssh #{server.user}@#{server.hostname} -t 'cd #{fetch(:deploy_to)}/current && RAILS_ENV=#{fetch(:rails_env)} bundle exec rails console'"
+
+    puts cmd
+
+    exec cmd
+  end
+end
+
 # namespace :deploy do
 #   ["start", "stop", "restart"].each do |command|
 #     desc "#{command} unicorn server"
