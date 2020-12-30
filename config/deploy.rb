@@ -3,10 +3,13 @@ lock "~> 3.14.1"
 
 set :application, "training"
 set :repo_url, "git@github.com:sonld-1516/trainning.git"
+set :deploy_to, "/usr/local/rails_app/training"
 
-set :pty, true
-set :linked_files, %w(config/database.yml config/master.key)
-set :linked_dirs, %w(log tmp/pids tmp/cache tmp/sockets vendor/bundle public/system public/uploads)
+# set :pty, true
+append :linked_files, "config/database.yml", "config/master.key"
+
+# Default value for linked_dirs is []
+append :linked_dirs, "log", "tmp/pids", "tmp/cache", "tmp/sockets", "public/system", "vendor/bundle", ".bundle", "public_upload"
 set :keep_releases, 5
 
 set :puma_rackup, -> { File.join(current_path, "config.ru") }
