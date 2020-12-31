@@ -15,16 +15,30 @@ set :keep_releases, 5
 set :pid_file, "#{shared_path}/tmp/pids/unicorn.pid"
 
 namespace :deploy do
-
   desc "Restart application"
   task :restart do
     on roles(:app), in: :sequence, wait: 5 do
       invoke "unicorn:restart"
     end
   end
+
+  desc "Stop application"
+  task :stop do
+    on roles(:app), in: :sequence, wait: 5 do
+      invoke "unicorn:stop"
+    end
+  end
+
+  desc "Start application"
+  task :start do
+    on roles(:app), in: :sequence, wait: 5 do
+      invoke "unicorn:start"
+    end
+  end
 end
 
-after "deploy:publishing", "deploy:restart"
+after "deploy:publishing", "deploy:stop", "deploy:start"
+after "deploy:stop", "deploy:start"
 
 # namespace :deploy do
 #   desc "Restart application"
