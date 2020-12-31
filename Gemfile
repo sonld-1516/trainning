@@ -54,7 +54,11 @@ group :development do
   gem 'capistrano-rails', require: false
   gem 'capistrano-rbenv', require: false
   gem 'capistrano-bundler', require: false
-  gem 'capistrano3-puma', require: false
+  gem 'capistrano3-unicorn', require: false
+end
+
+group :production do
+  gem "unicorn"
 end
 
 group :test do

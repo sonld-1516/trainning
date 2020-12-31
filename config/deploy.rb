@@ -1,4 +1,5 @@
 # config valid for current version and patch releases of Capistrano
+# require 'capistrano-unicorn'
 lock "~> 3.14.1"
 
 set :application, "training"
@@ -11,37 +12,27 @@ append :linked_files, "config/database.yml", "config/master.key"
 # Default value for linked_dirs is []
 append :linked_dirs, "log", "tmp/pids", "tmp/cache", "tmp/sockets", "public/system", "vendor/bundle", ".bundle", "public_upload"
 set :keep_releases, 5
+set :pid_file, "#{shared_path}/tmp/pids/unicorn.pid"
 
-set :puma_rackup, -> { File.join(current_path, "config.ru") }
-set :puma_state, -> { "#{shared_path}/tmp/pids/puma.state" }
-set :puma_pid, -> { "#{shared_path}/tmp/pids/puma.pid" }
-set :puma_bind, -> { "unix://#{shared_path}/tmp/sockets/puma.sock" }
-set :puma_conf, -> { "#{shared_path}/puma.rb" }
-set :puma_access_log, -> { "#{shared_path}/log/puma_access.log" }
-set :puma_error_log, -> { "#{shared_path}/log/puma_error.log" }
-set :puma_role, :app
-set :puma_env, fetch(:rack_env, fetch(:rails_env, "production"))
-set :puma_threads, [0, 8]
-set :puma_workers, 0
-set :puma_worker_timeout, nil
-set :puma_init_active_record, true
-set :puma_preload_app, false
-set :rbenv_map_bins, %w(rake gem bundle ruby rails puma pumactl)
+namespace :deploy do
 
-namespace :rails do
-  desc 'Open a rails console `cap [staging] rails:console [server_index default: 0]`'
-  task :console do
-    server = roles(:app)[ARGV[2].to_i]
-
-    puts "Opening a console on: #{server.hostname}...."
-
-    cmd = "ssh #{server.user}@#{server.hostname} -t 'cd #{fetch(:deploy_to)}/current && RAILS_ENV=#{fetch(:rails_env)} bundle exec rails console'"
-
-    puts cmd
-
-    exec cmd
+  desc "Restart application"
+  task :restart do
+    on roles(:app), in: :sequence, wait: 5 do
+      invoke "unicorn:restart"
+    end
   end
 end
+
+after "deploy:publishing", "deploy:restart"
+
+# namespace :deploy do
+#   desc "Restart application"
+#   task :restart do
+#     invoke "unicorn:restart"
+#   end
+# end
+# after "deploy:publishing", "deploy:restart"
 
 # namespace :deploy do
 #   ["start", "stop", "restart"].each do |command|

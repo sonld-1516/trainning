@@ -30,10 +30,11 @@ install_plugin Capistrano::SCM::Git
 require "capistrano/rbenv"
 require "capistrano/rails"
 require "capistrano/bundler"
-require "capistrano/puma"
-install_plugin Capistrano::Puma
+require "capistrano3/unicorn"
+# install_plugin Capistrano::Puma
 require "capistrano/rails/assets"
 require "capistrano/rails/migrations"
+# require 'capistrano-unicorn'
 set :rbenv_type, :user
 set :rbenv_ruby, '2.5.1'
 
